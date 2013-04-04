@@ -1,50 +1,47 @@
-/*
- * grunt-fileslist
- * https://github.com/omryn/grunt-fileslist
- *
- * Copyright (c) 2013 Omry Nachman
- * Licensed under the MIT license.
- */
+"use strict";
+module.exports = function (grunt) {
+    grunt.registerMultiTask('fileslist', function () {
+            var data = this.data;
 
-'use strict';
+            data.listTemplate = grunt.config.getRaw(this.name + '.' + this.target + '.listTemplate');
+            data.itemTemplate = grunt.config.getRaw(this.name + '.' + this.target + '.itemTemplate');
+            data.itemSeparator = grunt.config.getRaw(this.name + '.' + this.target + '.itemSeparator');
 
-module.exports = function(grunt) {
+            function renderFile(file, index, array) {
+                var fileBreakDown = file.split('/');
+                var Class = fileBreakDown.pop().replace(/.js$/i, '');
+                var Package = fileBreakDown.join('.');
+                print(grunt.template.process(itemTemplate, {data: {File: file, Package: Package, Class: Class}}));
+                if (index !== array.length - 1) {
+                    print(itemSeparator);
+                }
+            }
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
+            function unixPath(path) {
+                return path.replace(/\\/g, "/");
+            }
 
-  grunt.registerMultiTask('fileslist', 'Your task description goes here.', function() {
-    // Merge task-specific and/or target-specific options with these defaults.
-    var options = this.options({
-      punctuation: '.',
-      separator: ', '
-    });
+            var DEFAULT_LIST_TEMPLATE = '<%= items %>';
+            var RENDER_ITEMS = '<% files.sort().forEach(' + renderFile.toString() + ') %>';
+            var DEFAULT_ITEM_TEMPLATE = '<%= File %>';
+            var DEFAULT_ITEM_SEPARATOR = "\n";
 
-    // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
+            var expandOptions = {
+                filter: 'isFile'
+            };
+            if (data.base) {
+                expandOptions.cwd = data.base;
+            }
+            var model = {
+                files: grunt.file.expand(expandOptions, data.includes).map(unixPath).sort(),
+                listTemplate: data.listTemplate || DEFAULT_LIST_TEMPLATE,
+                itemTemplate: data.itemTemplate || DEFAULT_ITEM_TEMPLATE,
+                itemSeparator: data.itemSeparator || DEFAULT_ITEM_SEPARATOR,
+                items: RENDER_ITEMS
+            };
+
+            var list = grunt.template.process('<%= listTemplate %>', {data: model});
+            grunt.file.write(data.dest, list);
         }
-      }).map(function(filepath) {
-        // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
-
-      // Handle options.
-      src += options.punctuation;
-
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
-
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
-    });
-  });
-
+    );
 };

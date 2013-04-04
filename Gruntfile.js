@@ -7,67 +7,54 @@
  */
 
 'use strict';
+module.exports = function (grunt) {
 
-module.exports = function(grunt) {
-
-  // Project configuration.
-  grunt.initConfig({
-    jshint: {
-      all: [
-        'Gruntfile.js',
-        'tasks/*.js',
-        '<%= nodeunit.tests %>',
-      ],
-      options: {
-        jshintrc: '.jshintrc',
-      },
-    },
-
-    // Before generating any new files, remove any previously-created files.
-    clean: {
-      tests: ['tmp'],
-    },
-
-    // Configuration to be run (and then tested).
-    fileslist: {
-      default_options: {
-        options: {
+    // Project configuration.
+    grunt.initConfig({
+        jshint: {
+            all: [
+                'Gruntfile.js',
+                'tasks/*.js',
+                'test/javascript/**/*.js'
+            ],
+            options: {
+                jshintrc: '.jshintrc.json'
+            }
         },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123'],
+
+        // Before generating any new files, remove any previously-created files.
+        clean: {
+            tests: ['target']
         },
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!',
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123'],
-        },
-      },
-    },
 
-    // Unit tests.
-    nodeunit: {
-      tests: ['test/*_test.js'],
-    },
+        // Configuration to be run (and then tested).
+        fileslist: {
+            test: {
+                dest: 'target/result.xml',
+                includes: ['**/*.js', '!**/~*'],
+                base: 'test/resources',
+                itemTemplate: '\t\t<entry>' +
+                    '\n\t\t\t<key>skin.<%= Class %></key>' +
+                    '\n\t\t\t<value><%= Package %>.<%= Class %></value>' +
+                    '\n\t\t</entry>',
+                itemSeparator: '\n',
+                listTemplate: '<hashtableWrapper>' +
+                    '\n\t<hashtable>\n<%= items %>\n\t</hashtable>' +
+                    '\n</hashtableWrapper>'
+            }
+        }
 
-  });
+    });
 
-  // Actually load this plugin's task(s).
-  grunt.loadTasks('tasks');
+    // Actually load this plugin's task(s).
+    grunt.loadTasks('tasks');
 
-  // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
+    // These plugins provide necessary tasks.
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['clean', 'fileslist', 'nodeunit']);
 
-  // By default, lint and run all tests.
-  grunt.registerTask('default', ['jshint', 'test']);
+    // By default, lint and run all tests.
+    grunt.registerTask('default', ['jshint', 'clean', 'fileslist']);
 
 };

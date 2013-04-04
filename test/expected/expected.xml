@@ -1,0 +1,16 @@
+<hashtableWrapper>
+	<hashtable>
+		<entry>
+			<key>skin.ButtonSkin</key>
+			<value>skins.core.ButtonSkin</value>
+		</entry>
+		<entry>
+			<key>skin.ContactItemSkin</key>
+			<value>skins.core.ContactItemSkin</value>
+		</entry>
+		<entry>
+			<key>skin.InlineSkin</key>
+			<value>skins.core.InlineSkin</value>
+		</entry>
+	</hashtable>
+</hashtableWrapper>
