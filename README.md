@@ -35,6 +35,7 @@ grunt.initConfig({
                        '\n\t\t<package><%= Package %>/package>' +
                        '\n\t</entry>',
                    itemSeparator: '\n',
+                   disableSorting: false,
                    listTemplate: '<filesList>' +
                        '\n\t<%= items %>\n' +
                        '\n</filesList>'
