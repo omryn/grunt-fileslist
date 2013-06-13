@@ -52,6 +52,7 @@ module.exports = function (grunt) {
 
             var list = grunt.template.process('<%= listTemplate %>', {data: model});
             grunt.file.write(data.dest, list);
+            grunt.log.writeln('File ' + data.dest.cyan + ' created.');
         }
     );
 };
